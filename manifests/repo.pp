@@ -74,6 +74,12 @@ class ceph::repo (
     'Debian': {
       include ::apt
 
+      if($::lsbdistcodename == 'stretch') {
+        $apt_codename = 'jessie'
+      } else {
+        $apt_codename = $::lsbdistcodename
+      }
+
       if $ceph_mirror {
         $ceph_mirror_real = $ceph_mirror
       } else {
@@ -89,7 +95,7 @@ class ceph::repo (
       apt::source { 'ceph':
         ensure   => $ensure,
         location => $ceph_mirror_real,
-        release  => $::lsbdistcodename,
+        release  => $apt_codename,
         tag      => 'ceph',
       }
 
@@ -103,8 +109,8 @@ class ceph::repo (
 
         apt::source { 'ceph-fastcgi':
           ensure   => $ensure,
-          location => "http://gitbuilder.ceph.com/libapache-mod-fastcgi-deb-${::lsbdistcodename}-${::hardwaremodel}-basic/ref/master",
-          release  => $::lsbdistcodename,
+          location => "http://gitbuilder.ceph.com/libapache-mod-fastcgi-deb-${apt_codename}-${::hardwaremodel}-basic/ref/master",
+          release  => $apt_codename,
           require  => Apt::Key['ceph-gitbuilder'],
         }
 
